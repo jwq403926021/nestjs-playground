@@ -1,14 +1,23 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AuthGuard } from '@nestjs/passport';
+import { PrismaService } from './modules/orm-module/prisma.service';
+import { Prisma } from '@prisma/client';
+import { ResponseEntity } from './entities/ResponseEntity';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService, private readonly prismaService: PrismaService) {}
 
   @Get('/test-init')
-  @UseGuards(AuthGuard('azure-jwt'))
-  getHello(): Object {
-    return this.appService.getHello();
+  async getHello() {
+    const data: Prisma.UserCreateInput = {
+      email: `${+new Date()}@qq.com`,
+      name: 'jiang haha',
+      role: 'USER'
+    }
+    const res = await this.prismaService.user.create({
+      data
+    });
+    return ResponseEntity.OK(res)
   }
 }
