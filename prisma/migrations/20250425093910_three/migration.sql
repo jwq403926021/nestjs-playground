@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Department" ADD COLUMN     "createAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP;
