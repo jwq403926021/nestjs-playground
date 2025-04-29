@@ -1,5 +1,5 @@
 import { AuthGuard } from '@nestjs/passport';
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -18,5 +18,13 @@ export class AzureJwtAuthGuard extends AuthGuard('azure-jwt') {
       return true;
     }
     return super.canActivate(context);
+  }
+
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+    if (err || !user) {
+      Logger.warn(info.toString());
+      throw err || new UnauthorizedException('Invalid or missing token');
+    }
+    return user;
   }
 }

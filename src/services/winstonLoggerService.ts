@@ -1,7 +1,8 @@
-import { LoggerService } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import logger from '../utils/winston';
 
-export class WinstonLoggerService implements LoggerService {
+@Injectable()
+export class WinstonLoggerService extends ConsoleLogger {
   private getCallerContext(): string {
     const stack = new Error().stack;
     if (!stack) return 'unknown';
@@ -24,18 +25,28 @@ export class WinstonLoggerService implements LoggerService {
 
   log(message: any) {
     logger.info(message, { context: this.getCallerContext() });
+    // @ts-ignore
+    super.log(...arguments);
   }
-  error(message: any, trace?: string) {
-    logger.error(message, { trace, context: this.getCallerContext() });
+  error(message: any, stack?: string, context?: string) {
+    logger.error(message, { context: this.getCallerContext() });
+    // @ts-ignore
+    super.error(...arguments);
   }
   warn(message: any) {
     logger.warn(message, { context: this.getCallerContext() });
+    // @ts-ignore
+    super.warn(...arguments);
   }
-  debug?(message: any) {
+  debug(message: any) {
     logger.debug(message, { context: this.getCallerContext() });
+    // @ts-ignore
+    super.debug(...arguments);
   }
-  verbose?(message: any) {
+  verbose(message: any) {
     logger.verbose(message, { context: this.getCallerContext() });
+    // @ts-ignore
+    super.verbose(...arguments);
   }
 }
 

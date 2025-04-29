@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as os from 'node:os';
 
 const logDir = path.join(os.homedir(), 'logs');
-
+// const logDir = 'logs';
 const logger = createLogger({
   level: 'info',
   format: format.combine(
@@ -14,13 +14,9 @@ const logger = createLogger({
     format.splat(),
     format.json()
   ),
+  handleExceptions: true,
+  handleRejections: true,
   transports: [
-    new transports.Console({
-      format: format.combine(
-        format.colorize(),
-        format.simple()
-      ),
-    }),
     new transports.File({
       filename: path.join(logDir, 'error.log'),
       level: 'error',

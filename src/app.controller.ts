@@ -1,13 +1,20 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from './services/prisma.service';
 import { Prisma } from '@prisma/client';
 import { ResponseEntity } from './entities/ResponseEntity';
 import { Public } from './decorators/public.decorator';
+import { WinstonLoggerService } from './services/winstonLoggerService';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly prismaService: PrismaService,
+    private readonly loggerService: WinstonLoggerService
+  ) {
+    loggerService.setContext(AppController.name)
+  }
 
   @Get('/test-init')
   async getHello() {
@@ -25,12 +32,11 @@ export class AppController {
   @Public()
   @Get('/test-public')
   async testPublic() {
-    Logger.log('info log');
-    Logger.error('error log');
-    Logger.warn('error warn');
-    Logger.debug('error debug');
-    Logger.verbose('error verbose');
-    throw new Error('test error case.')
+    this.loggerService.log('info log');
+    this.loggerService.error('error log');
+    this.loggerService.warn('error warn');
+    this.loggerService.debug('error debug');
+    this.loggerService.verbose('error verbose');
     return 'test-public'
   }
 }
