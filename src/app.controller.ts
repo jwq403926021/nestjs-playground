@@ -12,9 +12,9 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly prismaService: PrismaService,
-    private readonly loggerService: WinstonLoggerService
+    private readonly logger: WinstonLoggerService
   ) {
-    loggerService.setContext(AppController.name)
+    logger.setContext(AppController.name)
   }
 
   @Get('/test-init')
@@ -33,19 +33,19 @@ export class AppController {
   @Public()
   @Get('/test-public')
   async testPublic() {
-    this.loggerService.log('info log');
-    this.loggerService.error('error log');
-    this.loggerService.warn('error warn');
-    this.loggerService.debug('error debug');
-    this.loggerService.verbose('error verbose');
+    this.logger.log('info log');
+    this.logger.error('error log');
+    this.logger.warn('error warn');
+    this.logger.debug('error debug');
+    this.logger.verbose('error verbose');
     return 'test-public'
   }
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(@Body() body, @UploadedFile() file: Express.Multer.File): Promise<any> {
-    this.loggerService.log(file);
-    this.loggerService.log(body);
+    this.logger.log(file);
+    this.logger.log(body);
     return ResponseEntity.OK(body);
     // file.stream.pipe();
   }
