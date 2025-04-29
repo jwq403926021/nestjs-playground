@@ -1,10 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from './services/prisma.service';
 import { Prisma } from '@prisma/client';
 import { ResponseEntity } from './entities/ResponseEntity';
 import { Public } from './decorators/public.decorator';
 import { WinstonLoggerService } from './services/winstonLoggerService';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class AppController {
@@ -38,5 +39,14 @@ export class AppController {
     this.loggerService.debug('error debug');
     this.loggerService.verbose('error verbose');
     return 'test-public'
+  }
+
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(@Body() body, @UploadedFile() file: Express.Multer.File): Promise<any> {
+    this.loggerService.log(file);
+    this.loggerService.log(body);
+    return ResponseEntity.OK(body);
+    // file.stream.pipe();
   }
 }
