@@ -1,8 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { PrismaService } from './modules/orm-module/prisma.service';
+import { PrismaService } from './services/prisma.service';
 import { Prisma } from '@prisma/client';
 import { ResponseEntity } from './entities/ResponseEntity';
+import { Public } from './decorators/public.decorator';
 
 @Controller()
 export class AppController {
@@ -19,5 +20,12 @@ export class AppController {
       data
     });
     return ResponseEntity.OK(res)
+  }
+
+  @Public()
+  @Get('/test-public')
+  async testPublic() {
+    // throw new Error('test error case.')
+    return 'test-public'
   }
 }
