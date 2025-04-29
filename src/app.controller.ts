@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from './services/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -25,7 +25,12 @@ export class AppController {
   @Public()
   @Get('/test-public')
   async testPublic() {
-    // throw new Error('test error case.')
+    Logger.log('info log');
+    Logger.error('error log');
+    Logger.warn('error warn');
+    Logger.debug('error debug');
+    Logger.verbose('error verbose');
+    throw new Error('test error case.')
     return 'test-public'
   }
 }
