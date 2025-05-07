@@ -2,18 +2,23 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AzureJwtAuthGuard } from './guards/AzureJwtAuthGuard';
 import { AllExceptionsFilter } from './filters/AllExceptionsFilter';
-import { WinstonLoggerService } from './services/winstonLoggerService';
+import serverlessExpress from '@codegenie/serverless-express';
+import { Callback, Context, Handler } from 'aws-lambda';
+
+let server: Handler;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bufferLogs: true
-  });
+  const app = await NestFactory.create(AppModule);
   const azureJwtAuthGuard = app.get(AzureJwtAuthGuard);
   app.enableCors();
   app.setGlobalPrefix('api');
   app.useGlobalGuards(azureJwtAuthGuard);
   app.useGlobalFilters(new AllExceptionsFilter());
-  app.useLogger(new WinstonLoggerService());
-  await app.listen(process.env.PORT ?? 3000);
+  await app.init();
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
 }
-bootstrap();
+export const handler: Handler = async (event: any, context: Context, callback: Callback) => {
+  server = server ?? (await bootstrap());
+  return server(event, context, callback);
+};

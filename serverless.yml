@@ -1,0 +1,39 @@
+service: serverless-example
+
+plugins:
+  - serverless-offline
+
+stages:
+  default:
+    resolvers:
+      aws-account-1:
+        type: aws
+        profile: wenqi.jiang@xenera-corp.com
+        region: us-east-1
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  memorySize: 2048
+  timeout: 20
+  resolver: aws-account-1
+
+
+package:
+  include:
+    - '!node_modules/**'
+    - 'node_modules/.prisma/**'
+    - 'dist/**'
+    - 'package.json'
+
+functions:
+  main:
+    handler: dist/main.handler
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
