@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFile, UseInterceptors, UsePipes } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from './services/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -6,6 +6,8 @@ import { ResponseEntity } from './entities/ResponseEntity';
 import { Public } from './decorators/public.decorator';
 import { WinstonLoggerService } from './services/winstonLoggerService';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { createUserDto, UserSchema } from './entities/UserDto';
+import { ZodValidationPipe } from './pipes/ZodValidationPipe';
 
 @Controller()
 export class AppController {
@@ -26,6 +28,30 @@ export class AppController {
     }
     const res = await this.prismaService.user.create({
       data
+    });
+    return ResponseEntity.OK(res)
+  }
+
+  @Post('/test-add-user')
+  @UsePipes(new ZodValidationPipe(UserSchema))
+  async addUser(@Body() createUserData: createUserDto) {
+    const data: Prisma.UserCreateInput = {
+      email: createUserData.email,
+      name: createUserData.name,
+      role: createUserData.role
+    }
+    if (createUserData.profile?.bio) {
+      data.profile = {
+        create: {
+          bio: createUserData.profile.bio,
+        },
+      };
+    }
+    const res = await this.prismaService.user.create({
+      data,
+      include: {
+        profile: true
+      }
     });
     return ResponseEntity.OK(res)
   }
